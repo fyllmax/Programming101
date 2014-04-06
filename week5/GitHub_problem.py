@@ -9,9 +9,25 @@ class GitApi():
 
     def __init__(self):
 
+        # self.is_username = False
         print('but firstly you need to set user to explore:')
-        self.user = input("SET USER>")
-        self.user_info = self.get_user_git()
+
+        try:
+            while True:
+                self.user = input("SET USER>")
+                self.user_info = self.get_user_git()
+                self.status = self.user_info.status_code
+
+                if self.status == 200:
+                    print('You got this user name right!')
+                    break
+                else:
+                    print("You have entered wrong user name. Try Again")
+                    print('')
+
+        except EOFError:
+            print("You have done something wrong")
+
         self.repo_list = None
 
     def get_user_git(self):
