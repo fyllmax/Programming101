@@ -13,18 +13,26 @@ class MovieReservationSystem():
         self.c = self.conn.cursor()
 
     def movies_in_cinema(self):
+
+        print('')
         print("Current movies:")
 
         sql_to_read = "SELECT ID, Name, Rating FROM movies"
         for row in self.c.execute(sql_to_read):
             print("[{}] - {} ({})".format(row[0], row[1], row[2]))
 
+        return ""
+
     def show_movies(self):
+
+        print('')
         print("Current movies:")
 
         sql_to_read = "SELECT ID, Name, Rating FROM movies ORDER BY rating ASC"
         for row in self.c.execute(sql_to_read):
             print("[{}] - {} ({})".format(row[0], row[1], row[2]))
+
+        return ""
 
     def show_movie_projections(self, movie_id):
 
@@ -37,6 +45,8 @@ class MovieReservationSystem():
 
         for row in self.c.execute(sql_to_read, (movie_id,)):
             print("[{}] - {} ({})".format(row[0], row[1], row[2], row[3]))
+
+        return ""
 
     def show_movie_projections_by_date(self, movie_id, date):
 
@@ -52,17 +62,22 @@ class MovieReservationSystem():
         for row in self.c.execute(sql_to_read, (date,)):
             print("[{}] - {} ({})".format(row[0], row[1], row[2]))
 
+        return ""
+
     def make_reservation(self):
 
+        print('')
         print("Step 1")
         user_name = input("Choose name>")
-        ticket_num = input("Choose number of tickets>")
-        print("Current movies:" + self.movies_in_cinema())
+        ticket_num = int(input("Choose number of tickets>"))
+        self.movies_in_cinema()
 
+        print('')
         print("Step 2 Choose a movie")
         choose_movie = input("Choose a movie>")
-        print(self.show_movie_projections(choose_movie))
+        self.show_movie_projections(choose_movie)
 
+        print('')
         print("Step 3 - Choose a projection")
         choose_projection = input("Choose a projection> ")
 
@@ -78,68 +93,47 @@ class MovieReservationSystem():
             ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
             ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]]
 
+        print('')
         print("Available seats marked with 0s")
         print(' ' + ' ' + '1 2 3 4 5 6 7 8 9 10')
 
         index = 1
         for i in seats:
             print("{} ".format(index) + " ".join(i))
-
+            index += 1
         print("")
 
         seats_to_choose = 1
+        choosen_seats = []
+
         while ticket_num != 0:
-            choose_seat = input('Choose seat{}>'.format(seats_to_choose))
+            print('Now choose seat for the {} person'.format(seats_to_choose))
+            choose_seat_row = int(input('Choose row>'))
+            choose_seat_num = int(input('Choose seat number>'))
+            choosen_seats.append((choose_seat_row, choose_seat_num))
+            if (choose_seat_row) < 11 or (choose_seat_num) < 11:
+
+                if seats[(choose_seat_row) - 1][(choose_seat_num) - 1] == "X":
+                    print('this seat sis already taken!')
+
+                else:
+                    seats[(choose_seat_row) - 1][(choose_seat_num) - 1] = "X"
+            else:
+                print('Lol Noo.. try again')
+
             ticket_num -= 1
             seats_to_choose += 1
 
-# MAKE RESERVATION
-# > make_reservation
-# Step 1 (User): Choose name>Tedi
-# Step 1 (User): Choose number of tickets> 2
-# Current movies:
-# [1] - The Hunger Games: Catching Fire (7.9)
-# [2] - Wreck-It Ralph (7.8)
-# [3] - Her (8.3)
-# Step 2 (Movie): Choose a movie> 2
-# Projections for movie 'Wreck-It Ralph':
-# [5] - 2014-04-02 19:30 (2D) - 98 spots available
-# [6] - 2014-04-02 22:00 (3D) - 100 spots availabe
-# Step 3 (Projection): Choose a projection> 5
-# Available seats (marked with a dot):
-#    1 2 3 4 5 6 7 8 9 10
-# 1  . . . . . . . . . .
-# 2  . . X X . . . . . .
-# 3  . . . . . . . . . .
-# 4  . . . . . . . . . .
-# 5  . . . . . . . . . .
-# 6  . . . . . . . . . .
-# 7  . . . . . . . . . .
-# 8  . . . . . . . . . .
-# 9  . . . . . . . . . .
-# 10 . . . . . . . . . .
+        if ticket_num == 0:
 
-# Step 4 (Seats): Choose seat 1> (2,3)
-# This seat is already taken!
-# Step 4 (Seats): Choose seat 1> (15, 16)
-# Lol...NO!
-# Step 4 (Seats): Choose seat 1> (7,8)
-# Step 4 (Seats): Choose seat 2> (7,7)
-# This is your reservation:
-# Movie: Wreck-It Ralph (7.8)
-# Date and Time: 2014-04-02 19:30 (2D)
-# Seats: (7,7), (7.8)
-# Step 5 (Confirm - type 'finalize') > finalize
-# Thanks.
+            movie = self.c.execute("SELECT Name FROM movies where ID = ?", (choose_movie,)).fetchone()[0]
 
+            projection = self.c.execute("SELECT date FROM projection WHERE ID = ?", (choose_projection,)).fetchone()[0]
 
-def main():
-
-    ArenaCinema = MovieReservationSystem()
-    ArenaCinema.show_movies()
-    ArenaCinema.show_movie_projections(1)
-    ArenaCinema.show_movie_projections_by_date(1, "2014-04-01")
-    ArenaCinema.make_reservation()
-
-if __name__ == '__main__':
-    main()
+            print('')
+            print('This is your reservation: ')
+            print('Reservation under the name of {}'.format(user_name))
+            print('Movie: {}'.format(movie))
+            print('Date & Time: {}'.format(projection))
+            print('Seats: {}'.format(choosen_seats))
+            return "THANKS"
