@@ -31,7 +31,7 @@ def check_pass(password):
 
 
 def main_menu():
-    print("Welcome to our bank service. You are not logged in. \nPlease register, login or reset_pass")
+    print("Welcome to our bank service. You are not logged in. \nPlease register, login or forgotten_pass")
 
     tries = 6
 
@@ -58,7 +58,7 @@ def main_menu():
             username = input("Enter your username: ")
 
             if username == sql_manager.check_user_exist(username):
-                print('there is such user')
+                print('Hello {}. Welcome again! Please enter your password to proceed '.format(username))
 
                 time_now = int(time())
                 time_between_logins = time_now - sql_manager.get_login_time(username)
@@ -71,7 +71,7 @@ def main_menu():
                     logged_user = sql_manager.login(username, password)
 
                     if logged_user:
-                        sql_manager.insert_login_timloe_of_register(username)
+                        sql_manager.insert_login_time_of_register(username)
                         logged_menu(logged_user)
                         break
 
@@ -86,28 +86,47 @@ def main_menu():
             else:
                 print("User with such name does not exists!")
 
-        elif command == 'reset_pass':
+        elif command == 'forgotten_pass':
 
             username = input('Enter username: ')
 
             if username == sql_manager.check_user_exist(username):
+
                 email = input('Enter email: ')
 
-                if email == sql_manager.check_user_email(email):
+                if email == sql_manager.check_user_email(username):
 
-                    random_hash = sql_manager.create_random_hash(username)
+                    sql_manager.create_random_hash(username)
 
-                    smtp.send_email(email, random_hash)
+                    get_random_hash = sql_manager.get_pass_code_hash(username)
+
+                    smtp.send_email(email, get_random_hash)
 
                     print('Check your email for the secret code')
 
                     enter_hash = input('Enter the secret code: ')
 
                     if enter_hash == sql_manager.get_pass_code_hash(username):
-                        new_password = input('Enter new password: ')
-                        sql_manager.change_password(new_password, username)
-                        print('You Successfullu changed your password')
-                        break
+
+                        new_password_pass = False
+
+                        while not new_password_pass:
+
+                            new_password = getpass.getpass('Enter new passowrd: ')
+
+                            if len(new_password) >= 8 and check_pass(new_password):
+                                new_password_pass = True
+                                sql_manager.change_password(new_password, username)
+                                print('You Successfully changed your password')
+                                break
+
+                            print("Password shoud be at least 8 characters, and shound contain a capital letter, a number and a special charachter")
+
+                else:
+                    print("There is no such email in our database")
+
+            else:
+                print('There is no such user in our database')
 
         elif command == 'help':
             print("login - for logging in!")
@@ -123,12 +142,15 @@ def main_menu():
 def logged_menu(logged_user):
     print("Welcome you are logged in as: " + logged_user.get_username())
     while True:
+        print("")
         command = input("Logged>>")
 
         if command == 'info':
             print("You are: " + logged_user.get_username())
             print("Your id is: " + str(logged_user.get_id()))
             print("Your balance is:" + str(logged_user.get_balance()) + '$')
+            print("You have left with {} tan codes".format(logged_user.tan_left()))
+            # print("Your email is:" + logged_user.get_email())
 
         elif command == 'changepass':
             new_pass = input("Enter your new password: ")
@@ -142,12 +164,42 @@ def logged_menu(logged_user):
             print(logged_user.get_message())
 
         elif command == 'help':
-            print("info - for showing account info")
-            print("changepass - for changing passowrd")
-            print("change-message - for changing users message")
-            print("show-message - for showing users message")
+            help_command = [
+                "List of commands:",
+                "",
+                "*info - for showing account info",
+                "*changepass - for changing passowrd",
+                "*change-message - for changing users message",
+                "*show-message - for showing users message",
+                "*deposit - putting funds in your bank acc",
+                "*withdraw - getting funds out of your bank acc",
+                "*balance - showing current available funds",
+                "*get_tan - sends email with 10 tan codes needed for transaction"]
+
+            print('\n'.join(help_command))
+
+        elif command == 'get_tan':
+            print(logged_user.get_tan())
+
+        elif command == 'deposit':
+            print(logged_user.deposit())
+
+        elif command == 'withdraw':
+            print(logged_user.withdraw())
+
+        elif command == 'balance':
+            print(logged_user.get_balance())
 
         elif command == 'exit':
+
+            sql_manager.update_balance(logged_user.get_username(), logged_user.get_balance())
+
+            if logged_user.check_tanlist_empty():
+                print("You had 0 tan codes, so we send you new ones.")
+                print(logged_user.get_new_tan())
+
+            sql_manager.update_tan(logged_user.get_username(), logged_user.get_left_tans())
+
             break
 
         else:
