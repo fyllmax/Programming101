@@ -59,7 +59,7 @@ def send_tan(email, tan_code):
 
     try:
         server.sendmail(sender, [TO], BODY)
-        print('email sent')
+        print('Sending email in process')
 
     except:
         print('error occured')
