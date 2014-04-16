@@ -1,6 +1,5 @@
 import os
 import glob
-import os
 
 
 def ext_count(fname):

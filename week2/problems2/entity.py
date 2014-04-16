@@ -87,9 +87,10 @@ class Hero(Entity):
     def __init__(self, name, health, nickname):
         super().__init__(name, health)
         self.nickname = nickname
+        self.race = "Hero"
 
     def known_as(self):
-        return ("%s %s" % (self.name, self.nickname))
+        return ("{} {}".format(self.name, self.nickname))
 
 
 class Orc(Entity):
@@ -97,6 +98,7 @@ class Orc(Entity):
     def __init__(self, name, health, berserk_factor):
         super().__init__(name, health)
         self.berserk_factor = berserk_factor
+        self.race = "Orc"
 
         if self.berserk_factor > 2:
             self.berserk_factor = 2
