@@ -18,12 +18,9 @@ class Entity():
         self.critical_hit = 1
 
     def is_alive(self):
-        if self.health < 1:
-            self.heath = 0
+        if self.health == 0:
             self.alive = False
             return False
-
-        self.alive = True
         return True
 
     def get_health(self):
@@ -93,31 +90,7 @@ class Hero(Entity):
         return ("{} {}".format(self.name, self.nickname))
 
 
-class Python(Entity):
-    """docstring for Orc"""
-    def __init__(self, name, health, berserk_factor):
-        super().__init__(name, health)
-        self.berserk_factor = berserk_factor
-        self.race = "Orc"
-
-        if self.berserk_factor > 2:
-            self.berserk_factor = 2
-        else:
-            self.berserk_factor = 1
-
-    def attack(self):
-
-        if not self.equipped_weapon:
-            self.critical_hit = 1
-
-        else:
-            if self.weapon.critical_hit():
-                self.critical_hit = 2
-
-        return self.attack_damage * self.critical_hit * self.berserk_factor
-
-
-class Anaconda(Entity):
+class Orc(Entity):
     """docstring for Orc"""
     def __init__(self, name, health, berserk_factor):
         super().__init__(name, health)
