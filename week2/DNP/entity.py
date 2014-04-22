@@ -18,20 +18,15 @@ class Entity():
         self.critical_hit = 1
 
     def is_alive(self):
-        if self.health < 1:
-            self.heath = 0
+        if self.health == 0:
             self.alive = False
             return False
-
-        self.alive = True
         return True
 
     def get_health(self):
         return self.health
 
     def take_damage(self, damage_points):
-
-        # damage_points = randint(0, self.max_health)
 
         if self.health <= damage_points:
             self.health = 0
@@ -41,9 +36,9 @@ class Entity():
 
         return self.health
 
-    def take_healing(self, healing_points):
+    def take_healing(self):
 
-        # healing_points = randint(0, self.max_health)
+        healing_points = randint(0, self.max_health)
 
         healed = False
 
@@ -115,16 +110,3 @@ class Orc(Entity):
                 self.critical_hit = 2
 
         return self.attack_damage * self.critical_hit * self.berserk_factor
-
-
-#Main
-
-
-# def main():
-#     loki = Hero("Avera", 100, "The Nutcracker")
-#     loki.take_damage(150)
-#     print(loki.get_health())
-
-# #Program run
-# if __name__ == '__main__':
-#     main()

@@ -4,6 +4,9 @@ from fight import Fight
 from entity import Hero, Orc
 from weapon import Weapon
 from random import randint
+from snakes import Python
+from snakes import Anaconda
+from item import give_weapon
 
 
 class Map():
@@ -25,21 +28,21 @@ class Map():
 
         if self.entity == "orc":
             self.entity = "O"
-            self.player1 = Orc(player_name, 100, 2)
+            self.player1 = Orc(player_name, 1000, 2)
 
             print('')
             print("{} is fighting with:".format(player_name))
 
-            self.player1.equip_weapon(self.give_weapon())
+            self.player1.equip_weapon(give_weapon())
 
         else:
             self.entity = "H"
-            self.player2 = Hero(player_name, 100, "The NutCracker")
+            self.player1 = Hero(player_name, 1000, "The NutCracker")
 
             print('')
             print("{} is fighting with:".format(player_name))
 
-            self.player2.equip_weapon(self.give_weapon())
+            self.player1.equip_weapon(give_weapon())
 
         for i in range(len(self.dungeon_map)):
             for j in range(len(self.dungeon_map[i])):
@@ -91,62 +94,50 @@ class Map():
         return True
 
     def fight_time(self):
-        if self.cords[self.spawned[0]] == self.cords[self.spawned[1]]:
+
+        if self.dungeon_map[self.UpDown][self.LeftRight] == 'P':
             print('')
             print("Its time for fight. Lets Bet!")
             print('')
-            self.its_show_time = Fight(self.player1, self.player2)
+
+            self.enemy = Python(10)
+
+            self.its_show_time = Fight(self.player1, self.enemy)
             self.its_show_time.simulate_fight()
 
-    def give_weapon(self):
+        elif self.dungeon_map[self.UpDown][self.LeftRight] == 'A':
+            print('')
+            print("Its time for fight. Lets Bet!")
+            print('')
 
-        TheFist = Weapon("Anger Fist", 35, 0.3)
+            self.enemy = Anaconda(10, (4, 1.5))
 
-        TheBlades = Weapon("Ilidan Blades", 20, 0.25)
+            self.its_show_time = Fight(self.player1, self.enemy)
+            self.its_show_time.simulate_fight()
 
-        GladiatorKnife = Weapon("Axill Sword", 15, 0.5)
+    def item(self):
 
-        TheRebornMace = Weapon("Trojan Mace", 50, 0.15)
+        item = randint(0, 1)
 
-        ThunderKick = Weapon("Chuck Noriss Enlightment", 80, 1)
+        if self.dungeon_map[self.UpDown][self.LeftRight] == 'I':
 
-        PitLord = Weapon("Black Hole", 50, 0.1)
+            if item == 0:
 
-        Ruthless = Weapon("Bitch Slap", 45, 0.4)
+                self.player1.equip_weapon(give_weapon())
 
-        select_weapon = randint(0, 6)
-
-        weapons = [TheFist, TheBlades, GladiatorKnife, TheRebornMace, ThunderKick, PitLord, Ruthless]
-
-        print(weapons[select_weapon].model)
-        return weapons[select_weapon]
+            else:
+                self.player1.take_healing()
 
 
 def main():
 
-    new_map = Dungeon('basic_dungeon.txt')
-    map_play = Map(new_map)
-    map_play.spawn('Loki', 'orc')
-    map_play.spawn('Arthur', 'hero')
-    map_play.move('Loki', 'right')
-    map_play.move('Loki', 'down')
-    map_play.move('Loki', 'down')
-    map_play.move('Loki', 'down')
-    map_play.move('Loki', 'right')
-    map_play.move('Loki', 'right')
-    map_play.move('Loki', 'right')
-    map_play.move('Loki', 'right')
-    map_play.move('Loki', 'up')
-    map_play.move('Loki', 'up')
-    map_play.move('Loki', 'up')
-    map_play.move('Loki', 'right')
-    map_play.move('Loki', 'right')
-    map_play.move('Loki', 'right')
-    map_play.move('Loki', 'right')
-    map_play.move('Loki', 'down')
-    map_play.move('Loki', 'down')
-    map_play.move('Loki', 'down')
-    map_play.move('Loki', 'down')
+    igrach = Dungeon(1)
+    test = Map(igrach)
+
+    test.spawn("Max", 'Orc')
+    test.move("Max", 'right')
+    test.move("Max", 'right')
+    test.move("Max", 'right')
 
 
 if __name__ == '__main__':

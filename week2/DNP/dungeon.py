@@ -1,22 +1,25 @@
 # Imports
-
+from os import getcwd
 
 # Function
 
 
 class Dungeon():
     """docstring for Dungeon"""
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self, level=1):
+
+        self.level = level
         self.dng_map = self.map_to_matrix()
 
     def load_map(self):
 
+        filename = getcwd() + '/maps/level_{}.txt'.format(str(self.level))
+
         try:
-            filename = self.filename
             fileOpen = open(filename, "r")
             self.content = fileOpen.read()
             fileOpen.close()
+
         except (IOError, IndexError):
             exit("Error: Try again, wrong file name given!")
 
@@ -34,9 +37,8 @@ class Dungeon():
 
 
 # def main():
-#     new_map = Dungeon("basic_dungeon.txt")
-#     print(new_map.print_map())
-
-
+#     test = Dungeon(2)
+#     print(test.load_map())
+#     print(test.print_map())
 # if __name__ == '__main__':
 #     main()
